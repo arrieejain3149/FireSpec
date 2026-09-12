@@ -10,6 +10,10 @@ from src.selector import select_response_portfolio
 
 app = FastAPI()
 
+@app.get("/")
+async def root():
+    return {"message": "IGNIS FastAPI Backend Server Running", "status": "ok", "docs": "/docs"}
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
