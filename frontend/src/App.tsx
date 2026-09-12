@@ -440,11 +440,11 @@ function App() {
           </div>
 
           {/* FINAL ROW: Operational Dispatch Manifest (Full Width) */}
-          <div className="bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col overflow-hidden">
-            <div className="flex justify-between items-center p-6 border-b-2 border-black shrink-0 bg-[#111] text-white">
+          <div className="bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col overflow-hidden mb-12">
+            <div className="flex justify-between items-center p-6 border-b-4 border-black shrink-0 bg-white">
               <div>
-                  <h3 className="text-xl font-bold uppercase tracking-wide text-white">Operational Dispatch Manifest</h3>
-                  <p className="text-[#AAA] text-sm mt-1">Live GPS disbursal instructions for response teams, sorted by physical fire intensity.</p>
+                  <h3 className="text-3xl font-black uppercase tracking-tighter text-black">Team Deployment</h3>
+                  <p className="text-black font-bold text-sm mt-1 uppercase tracking-widest">Live GPS Locations • Sorted by Fire Severity</p>
               </div>
               <button 
                 onClick={() => {
@@ -457,54 +457,71 @@ function App() {
                   link.click();
                   document.body.removeChild(link);
                 }} 
-                className="text-xs font-bold uppercase tracking-wider border-2 border-white px-4 py-2 hover:bg-white hover:text-black transition-colors shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] text-white"
+                className="text-xs font-black uppercase tracking-widest border-4 border-black bg-white text-black px-6 py-3 hover:bg-black hover:text-white transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >
-                Export GPS Manifest
+                Export GPS Plan
               </button>
             </div>
+            
+            {/* Geographic Selector Engine Status */}
+            <div className="bg-white border-b-4 border-black flex flex-wrap text-xs font-black tracking-widest uppercase font-mono divide-x-4 divide-black">
+              <div className="flex items-center gap-3 px-6 py-4 bg-black text-white">
+                 <div className="w-3 h-3 bg-white animate-pulse"></div>
+                 <span>System Active</span>
+              </div>
+              <div className="px-6 py-4 text-black flex items-center">
+                 LIMIT: <span className="ml-2 px-2 py-1 bg-black text-white">MAX 4 TEAMS PER AREA</span>
+              </div>
+              <div className="px-6 py-4 text-black flex items-center">
+                 ACTION: <span className="ml-2 text-[#DC2626]">EXCESS SENT TO NEXT FIRE</span>
+              </div>
+            </div>
+
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-[#F8F9FA] border-b-2 border-black font-bold">
+                <thead className="bg-white border-b-4 border-black font-black">
                   <tr>
-                    <th className="p-4 border-r-2 border-black uppercase text-[#666] tracking-wider text-xs">Response Unit</th>
-                    <th className="p-4 border-r-2 border-black uppercase text-black tracking-wider text-xs">GPS Coordinates</th>
-                    <th className="p-4 border-r-2 border-black uppercase text-black tracking-wider text-xs bg-red-50 text-[#DC2626]">NASA FRP (POWER)</th>
-                    <th className="p-4 border-r-2 border-black uppercase text-[#666] tracking-wider text-xs">SATELLITE CONFIDENCE</th>
-                    <th className="p-4 border-r-2 border-black uppercase text-[#DC2626] tracking-wider text-xs">Intensity (Hazard)</th>
-                    <th className="p-4 border-r-2 border-black uppercase text-black tracking-wider text-xs">Fire Classification</th>
-                    <th className="p-4 uppercase text-black tracking-wider text-xs">Impacted Industry</th>
+                    <th className="p-5 border-r-4 border-black uppercase text-black tracking-widest text-xs">Team</th>
+                    <th className="p-5 border-r-4 border-black uppercase text-black tracking-widest text-xs">GPS Target</th>
+                    <th className="p-5 border-r-4 border-black uppercase text-black tracking-widest text-xs">Satellite Heat</th>
+                    <th className="p-5 border-r-4 border-black uppercase text-black tracking-widest text-xs">Teams Assigned</th>
+                    <th className="p-5 border-r-4 border-black uppercase text-black tracking-widest text-xs">Danger Score</th>
+                    <th className="p-5 border-r-4 border-black uppercase text-black tracking-widest text-xs">Fire Type</th>
+                    <th className="p-5 uppercase text-black tracking-widest text-xs">Property at Risk</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...data.portfolio]
-                    .sort((a: any, b: any) => b.ranking_score - a.ranking_score)
+                    .sort((a: any, b: any) => {
+                      if (b.count !== a.count) return b.count - a.count;
+                      return b.ranking_score - a.ranking_score;
+                    })
                     .map((row: any, i: number) => (
-                    <tr key={i} className="border-b border-[#E5E5E5] hover:bg-[#F1F5F9] font-mono text-sm transition-colors">
-                      <td className="p-4 border-r-2 border-black/10 font-bold bg-black/5 text-black">
+                    <tr key={i} className="border-b-2 border-black group hover:bg-black hover:text-white font-mono text-sm transition-colors bg-white text-black">
+                      <td className="p-5 border-r-2 border-black group-hover:border-white/20 font-black">
                         UNIT-{String(i+1).padStart(2, '0')}
                       </td>
-                      <td className="p-4 border-r-2 border-black/10 font-bold text-[#DC2626]">
+                      <td className="p-5 border-r-2 border-black group-hover:border-white/20 font-bold group-hover:text-white text-[#DC2626]">
                         {Number(row.lat || 0).toFixed(5)}, {Number(row.lon || 0).toFixed(5)}
                       </td>
-                      <td className="p-4 border-r-2 border-black/10 font-bold bg-red-50 text-[#DC2626]">
-                        {row.nasa_frp ? `${Number(row.nasa_frp).toFixed(1)} MW` : 'N/A'}
+                      <td className="p-5 border-r-2 border-black group-hover:border-white/20 font-black">
+                        {row.nasa_frp ? `${Number(row.nasa_frp).toFixed(1)} MW` : '---'}
                       </td>
-                      <td className="p-4 border-r-2 border-black/10 font-bold text-xs">
-                        {row.nasa_confidence ? (
-                          <span className={row.nasa_confidence === 'High' ? 'text-[#DC2626] font-black' : 'text-[#F97316]'}>
-                            {row.nasa_confidence.toUpperCase()} ({row.satellite})
-                          </span>
-                        ) : (
-                          <span className="text-[#888]">TERRESTRIAL</span>
-                        )}
+                      <td className="p-5 border-r-2 border-black group-hover:border-white/20 font-black">
+                        <div className="flex items-center gap-1">
+                          {[...Array(4)].map((_, idx) => (
+                             <div key={idx} className={`h-4 w-2 ${idx < row.count ? 'bg-current' : 'border-2 border-current opacity-20'}`}></div>
+                          ))}
+                          <span className="ml-3">{row.count === 4 ? 'MAX' : `${row.count}/4`}</span>
+                        </div>
                       </td>
-                      <td className="p-4 border-r-2 border-black/10 font-bold text-black">
+                      <td className="p-5 border-r-2 border-black group-hover:border-white/20 font-black">
                         {Number(row.ranking_score || 0).toFixed(4)}
                       </td>
-                      <td className="p-4 border-r-2 border-black/10 font-bold">
+                      <td className="p-5 border-r-2 border-black group-hover:border-white/20 font-bold">
                         {row.fire_type}
                       </td>
-                      <td className="p-4 font-bold text-[#555]">
+                      <td className="p-5 font-bold">
                         {row.industry_sector}
                       </td>
                     </tr>
